@@ -1,4 +1,4 @@
-package sh.carr.ember.api
+package sh.carr.ember
 
 import org.bukkit.Bukkit
 
@@ -13,5 +13,5 @@ interface Ember {
                 .provider
     }
 
-    val version: String
+    val version: Version
 }

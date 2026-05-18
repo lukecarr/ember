@@ -5,7 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import net.kyori.adventure.text.minimessage.MiniMessage
-import sh.carr.ember.api.Ember
+import sh.carr.ember.Ember
 
 object VersionCommand {
     val component by lazy {

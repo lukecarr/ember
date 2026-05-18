@@ -3,7 +3,7 @@ package sh.carr.ember.plugin
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.java.JavaPlugin
-import sh.carr.ember.api.Ember
+import sh.carr.ember.Ember
 import sh.carr.ember.plugin.command.EmberCommand
 
 class EmberPlugin :
@@ -17,5 +17,5 @@ class EmberPlugin :
         }
     }
 
-    override val version = pluginMeta.version
+    override val version = SemVer.parse(pluginMeta.version)
 }

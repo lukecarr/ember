@@ -10,8 +10,9 @@ repositories {
 
 val rootProperties = Properties()
 file("../gradle.properties").reader().use { rootProperties.load(it) }
-val kotlinVersion = rootProperties.getProperty("kotlinVersion")
-    ?: error("kotlinVersion missing from root gradle.properties")
+val kotlinVersion =
+    rootProperties.getProperty("kotlinVersion")
+        ?: error("kotlinVersion missing from root gradle.properties")
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
