@@ -28,6 +28,12 @@ kotlin {
     }
 }
 
+dependencies {
+    "testImplementation"("io.kotest:kotest-runner-junit5:6.1.11")
+    "testImplementation"("io.kotest:kotest-assertions-core:6.1.11")
+    "testImplementation"("io.kotest:kotest-property:6.1.11")
+}
+
 tasks {
     withType<JavaCompile>().configureEach {
         options.release = 25
@@ -35,5 +41,8 @@ tasks {
     }
     withType<Javadoc>().configureEach {
         options.encoding = Charsets.UTF_8.name()
+    }
+    withType<Test>().configureEach {
+        useJUnitPlatform()
     }
 }

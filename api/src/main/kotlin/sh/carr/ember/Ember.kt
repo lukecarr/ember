@@ -13,5 +13,5 @@ interface Ember {
                 .provider
     }
 
-    val version: String
+    val version: Version
 }

@@ -17,5 +17,5 @@ class EmberPlugin :
         }
     }
 
-    override val version = pluginMeta.version
+    override val version = SemVer.parse(pluginMeta.version)
 }
