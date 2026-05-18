@@ -6,7 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import sh.carr.ember.Ember
 import sh.carr.ember.plugin.command.EmberCommand
 
-class EmberPlugin :
+open class EmberPlugin :
     JavaPlugin(),
     Ember {
     override fun onEnable() {

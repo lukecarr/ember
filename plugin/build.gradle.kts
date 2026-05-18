@@ -21,6 +21,16 @@ val kotlinVersion: String by project
 dependencies {
     implementation(project(":api"))
     paperweight.paperDevBundle(paperApiVersion)
+
+    testImplementation("io.papermc.paper:paper-api:26.1.2.build.57-stable")
+    testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v26.1.2:4.113.1")
+    testImplementation("io.mockk:mockk:1.13.13")
+}
+
+// https://docs.mockbukkit.org/docs/en/user_guide/advanced/paperweight.html
+paperweight {
+    addServerDependencyTo =
+        configurations.named(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).map { setOf(it) }
 }
 
 paperPluginYaml {
@@ -102,5 +112,23 @@ tasks {
 
     runServer {
         minecraftVersion("26.1.2")
+    }
+
+    jacocoTestReport {
+        classDirectories.setFrom(
+            files(
+                classDirectories.files.map {
+                    fileTree(it) {
+                        exclude(
+                            "sh/carr/ember/plugin/command/Permissions*.class",
+                            "sh/carr/ember/plugin/EmberPluginLoader*.class",
+                        )
+                    }
+                },
+            ),
+        )
+    }
+    jacocoTestCoverageVerification {
+        classDirectories.setFrom(jacocoTestReport.get().classDirectories)
     }
 }

@@ -11,6 +11,9 @@ val paperApiVersion: String by project
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:$paperApiVersion")
+
+    testImplementation("io.papermc.paper:paper-api:$paperApiVersion")
+    testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v26.1.2:4.113.1")
 }
 
 publishing {

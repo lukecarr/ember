@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
+import sh.carr.ember.Version
 
 class SemVerTest :
     FunSpec({
@@ -76,6 +77,24 @@ class SemVerTest :
                 SemVer(1, 2, 3).compareTo(SemVer(1, 2, 3)) shouldBe 0
                 SemVer(1, 2, 3, "rc.1").compareTo(SemVer(1, 2, 3, "rc.1")) shouldBe 0
             }
+
+            test("falls back to lexical toString comparison against non-SemVer Version") {
+                val other =
+                    object : Version {
+                        override fun toString(): String = "9.9.9"
+
+                        override fun compareTo(other: Version): Int = toString().compareTo(other.toString())
+                    }
+                (SemVer(1, 0, 0).compareTo(other) < 0) shouldBe true
+            }
+
+            test("pre-release is outranked by no-pre-release (reverse direction)") {
+                (SemVer(1, 0, 0) > SemVer(1, 0, 0, "rc.1")) shouldBe true
+            }
+
+            test("non-numeric pre-release identifier outranks numeric (reverse direction)") {
+                (SemVer(1, 0, 0, "alpha") > SemVer(1, 0, 0, "1")) shouldBe true
+            }
         }
 
         context("toString") {
@@ -85,6 +104,16 @@ class SemVerTest :
 
             test("renders triple with pre-release") {
                 SemVer(0, 1, 0, "SNAPSHOT").toString() shouldBe "0.1.0-SNAPSHOT"
+            }
+        }
+
+        context("preRelease accessor") {
+            test("returns the constructor-supplied pre-release identifier") {
+                SemVer(1, 2, 3, "rc.1").preRelease shouldBe "rc.1"
+            }
+
+            test("defaults to null when omitted") {
+                SemVer(1, 2, 3).preRelease shouldBe null
             }
         }
 
