@@ -28,7 +28,7 @@ class EmberPluginTest :
         }
 
         test("exposes plugin version as a parsed SemVer") {
-            plugin.version shouldBe SemVer(0, 1, 0, "SNAPSHOT")
+            plugin.version shouldBe SemVer(0, 1, 0, "alpha.1")
         }
 
         test("Ember.instance resolves to the loaded plugin") {
