@@ -1,4 +1,4 @@
-package sh.carr.ember.api
+package sh.carr.ember
 
 import org.bukkit.Bukkit
 
