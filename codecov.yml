@@ -1,0 +1,10 @@
+component_management:
+  individual_components:
+    - component_id: api
+      name: api
+      paths:
+        - api/**
+    - component_id: plugin
+      name: plugin
+      paths:
+        - plugin/**
