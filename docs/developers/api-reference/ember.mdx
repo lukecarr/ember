@@ -44,7 +44,7 @@ Ember ember = Ember.getInstance();
 
 </CodeGroup>
 
-Internally, this calls `Bukkit.getServer().getServicesManager().getRegistration(Ember.class).getProvider()`. It throws if Ember isn't loaded — declare Ember as a [required dependency](/developers/getting-started#declare-ember-as-a-dependency) of your plugin so the lookup is always safe.
+Internally, this calls `Bukkit.getServer().getServicesManager().getRegistration(Ember.class).getProvider()`. It throws if Ember isn't loaded — declare Ember as a [required dependency](/developers/quickstart#declare-ember-as-a-dependency) of your plugin so the lookup is always safe.
 
 ## Example: log the running version
 

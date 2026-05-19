@@ -1,5 +1,5 @@
 ---
-title: "Getting started"
+title: "Quickstart"
 description: "Add the Ember API to your plugin."
 ---
 
@@ -103,12 +103,20 @@ getLogger().info("Running Ember " + emberVersion);
 
 ## Declare Ember as a dependency
 
-Add Ember to your plugin's `paper-plugin.yml` so your plugin loads after Ember and `Ember.instance` is always available:
+Add Ember as a hard dependency of your plugin so it loads after Ember and `Ember.instance` is always available.
 
-```yaml
+<CodeGroup>
+
+```yaml paper-plugin.yml
 dependencies:
   server:
     Ember:
       load: BEFORE
       required: true
 ```
+
+```yaml plugin.yml
+depend: [Ember]
+```
+
+</CodeGroup>

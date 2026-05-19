@@ -55,10 +55,15 @@
         "tab": "Developers",
         "groups": [
           {
+            "group": "Getting started",
+            "pages": [
+              "developers/index"
+            ]
+          },
+          {
             "group": "Documentation",
             "pages": [
-              "developers/index",
-              "developers/getting-started",
+              "developers/quickstart",
               "developers/concepts"
             ]
           },
