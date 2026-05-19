@@ -1,0 +1,10 @@
+accessor
+APIs
+bukkit
+folia
+minecraft
+repo
+subcommand
+subcommands
+walkthrough
+walkthroughs
