@@ -1,0 +1,114 @@
+---
+title: "Getting started"
+description: "Add the Ember API to your plugin."
+---
+
+## Add the repository
+
+The Ember API is published to [GitHub Packages](https://github.com/lukecarr/ember/packages). You'll need to authenticate with a [GitHub personal access token](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-to-github-packages) that has the `read:packages` scope.
+
+<CodeGroup>
+
+```kotlin Gradle (Kotlin DSL)
+repositories {
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/lukecarr/ember")
+        credentials {
+            username = providers.gradleProperty("gpr.user").orNull
+                ?: System.getenv("GITHUB_ACTOR")
+            password = providers.gradleProperty("gpr.token").orNull
+                ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+}
+```
+
+```groovy Gradle (Groovy)
+repositories {
+    maven {
+        name = "GitHubPackages"
+        url = "https://maven.pkg.github.com/lukecarr/ember"
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+}
+```
+
+```xml Maven
+<repositories>
+  <repository>
+    <id>github</id>
+    <url>https://maven.pkg.github.com/lukecarr/ember</url>
+  </repository>
+</repositories>
+```
+
+</CodeGroup>
+
+## Add the dependency
+
+<CodeGroup>
+
+```kotlin Gradle (Kotlin DSL)
+dependencies {
+    compileOnly("sh.carr.ember:ember-api:0.1.0-alpha.1")
+}
+```
+
+```groovy Gradle (Groovy)
+dependencies {
+    compileOnly "sh.carr.ember:ember-api:0.1.0-alpha.1"
+}
+```
+
+```xml Maven
+<dependencies>
+  <dependency>
+    <groupId>sh.carr.ember</groupId>
+    <artifactId>ember-api</artifactId>
+    <version>0.1.0-alpha.1</version>
+    <scope>provided</scope>
+  </dependency>
+</dependencies>
+```
+
+</CodeGroup>
+
+Use `compileOnly` / `provided` — the API is bundled inside the running Ember plugin, so you don't want a second copy inside your own jar.
+
+## Hello, Ember
+
+Read the running Ember version:
+
+<CodeGroup>
+
+```kotlin Kotlin
+import sh.carr.ember.Ember
+
+val emberVersion = Ember.instance.version
+logger.info("Running Ember $emberVersion")
+```
+
+```java Java
+import sh.carr.ember.Ember;
+
+var emberVersion = Ember.getInstance().getVersion();
+getLogger().info("Running Ember " + emberVersion);
+```
+
+</CodeGroup>
+
+## Declare Ember as a dependency
+
+Add Ember to your plugin's `paper-plugin.yml` so your plugin loads after Ember and `Ember.instance` is always available:
+
+```yaml
+dependencies:
+  server:
+    Ember:
+      load: BEFORE
+      required: true
+```

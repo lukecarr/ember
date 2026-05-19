@@ -1,0 +1,44 @@
+---
+title: "Concepts"
+description: "How the Ember API is shaped."
+---
+
+## Service-based entry point
+
+Ember exposes its API through Bukkit's `ServicesManager`. At startup, the plugin registers itself as the provider for the `sh.carr.ember.Ember` interface at the highest priority.
+
+To get a handle on the running instance you don't need to look up Ember's plugin class — you ask the services manager, or use the convenience accessor on the interface itself.
+
+<CodeGroup>
+
+```kotlin Kotlin
+import sh.carr.ember.Ember
+
+val ember = Ember.instance
+```
+
+```java Java
+import sh.carr.ember.Ember;
+
+Ember ember = Ember.getInstance();
+```
+
+</CodeGroup>
+
+The `instance` accessor is equivalent to `Bukkit.getServer().getServicesManager().getRegistration(Ember.class).getProvider()`. Use it any time after Ember has loaded — declare Ember as a [required dependency](/developers/getting-started#declare-ember-as-a-dependency) of your plugin so the lookup is always safe.
+
+## Compatibility
+
+Ember is built against the Paper API and marked `folia-supported: true`. The same jar runs on both Paper and Folia without changes, and so does any plugin that consumes the Ember API.
+
+If your plugin needs to integrate with Ember on Folia, use Folia's scheduler APIs as you normally would — nothing about the Ember API requires the main thread.
+
+## Versioning
+
+Ember follows [Semantic Versioning 2.0.0](https://semver.org/). The current major series is `0.x`, which means breaking changes can land in any release until `1.0.0`.
+
+The API surface is intentionally tiny today so that the breaking-change window costs as little as possible. Pin your dependency to the exact version you tested against during the alpha:
+
+```
+sh.carr.ember:ember-api:0.1.0-alpha.1
+```

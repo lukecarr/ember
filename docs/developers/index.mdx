@@ -1,0 +1,24 @@
+---
+title: "For developers"
+description: "Build plugins that integrate with the Ember API."
+---
+
+Ember exposes a small public API for other plugins to interact with. The API lives in a separate Maven artifact (`sh.carr.ember:ember-api`) so you can compile against it without pulling in the full plugin.
+
+<Note>
+  Per-class JavaDocs are published separately. The pages here cover concepts and the high-level shape of the API; reach for JavaDocs when you need the precise signature of a member.
+</Note>
+
+## Find your way
+
+<Columns cols={2}>
+  <Card title="Getting started" icon="rocket" href="/developers/getting-started">
+    Add the dependency to your build and read your first value from Ember.
+  </Card>
+  <Card title="Concepts" icon="lightbulb" href="/developers/concepts">
+    How the API is shaped, and why it looks the way it does.
+  </Card>
+  <Card title="API reference" icon="book" href="/developers/api-reference">
+    The public types Ember exposes.
+  </Card>
+</Columns>

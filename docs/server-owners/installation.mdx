@@ -1,0 +1,39 @@
+---
+title: "Installation"
+description: "Install Ember on your Paper or Folia server."
+---
+
+## Requirements
+
+- **Server software:** [Paper](https://papermc.io/software/paper/) or [Folia](https://papermc.io/software/folia/)
+- **Minecraft version:** 1.26.1 or newer
+- **Java:** JDK 25 or newer
+
+Ember is Folia-safe — the same jar runs on either Paper or Folia, no configuration changes needed.
+
+## Install
+
+<Steps>
+  <Step title="Download the jar">
+    Grab the latest `ember-<version>.jar` from [GitHub Releases](https://github.com/lukecarr/ember/releases). Each release also publishes a `.sha256` checksum if you want to verify the download.
+  </Step>
+  <Step title="Drop it in `plugins/`">
+    Move the jar into your server's `plugins/` directory.
+  </Step>
+  <Step title="Restart your server">
+    Ember loads at startup. A restart is the cleanest way to get it running.
+  </Step>
+  <Step title="Verify">
+    From the server console (or as an operator in-game), run:
+
+    ```
+    /ember version
+    ```
+
+    You should see the running version printed back.
+  </Step>
+</Steps>
+
+<Warning>
+  Ember is in early alpha. Run it on a test server before adding it to production.
+</Warning>
