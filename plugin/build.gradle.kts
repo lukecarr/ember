@@ -47,6 +47,10 @@ paperPluginYaml {
             description.set("Check the running Ember version")
             default.set(Permission.Default.OP)
         }
+        register("ember.flags") {
+            description.set("List and inspect Ember feature flags")
+            default.set(Permission.Default.OP)
+        }
     }
 }
 
@@ -120,6 +124,7 @@ tasks {
                 classDirectories.files.map {
                     fileTree(it) {
                         exclude(
+                            "**/*\$DefaultImpls.class",
                             "sh/carr/ember/plugin/command/Permissions*.class",
                             "sh/carr/ember/plugin/EmberPluginLoader*.class",
                         )

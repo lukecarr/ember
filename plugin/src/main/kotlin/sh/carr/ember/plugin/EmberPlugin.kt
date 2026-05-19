@@ -5,6 +5,8 @@ import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.java.JavaPlugin
 import sh.carr.ember.Ember
 import sh.carr.ember.plugin.command.EmberCommand
+import sh.carr.ember.plugin.flag.SimpleFlagManager
+import java.io.File
 
 open class EmberPlugin :
     JavaPlugin(),
@@ -15,7 +17,14 @@ open class EmberPlugin :
         lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
             event.registrar().register(EmberCommand.node())
         }
+
+        val file = File(dataFolder, "flags.txt")
+        if (file.exists()) {
+            flagManager.load(file.readLines().map { it.lowercase().trim() })
+        }
     }
 
     override val version = SemVer.parse(pluginMeta.version)
+
+    override val flagManager = SimpleFlagManager()
 }

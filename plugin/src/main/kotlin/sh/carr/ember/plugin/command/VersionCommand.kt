@@ -6,13 +6,16 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import net.kyori.adventure.text.minimessage.MiniMessage
 import sh.carr.ember.Ember
+import sh.carr.ember.plugin.flag.Flags
 
-object VersionCommand {
+object VersionCommand : Subcommand {
+    override val flag = Flags.VersionCommand
+
     val component by lazy {
         MiniMessage.miniMessage().deserialize("<white>Ember version: <gray>${Ember.instance.version}")
     }
 
-    fun node(): LiteralArgumentBuilder<CommandSourceStack> =
+    override fun node(): LiteralArgumentBuilder<CommandSourceStack> =
         Commands
             .literal("version")
             .requires { it.sender.hasPermission(Permissions.VERSION) }

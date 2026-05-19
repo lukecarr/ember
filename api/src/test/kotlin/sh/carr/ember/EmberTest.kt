@@ -5,6 +5,8 @@ import io.kotest.matchers.shouldBe
 import org.bukkit.plugin.ServicePriority
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
+import sh.carr.ember.flag.Flag
+import sh.carr.ember.flag.FlagManager
 
 class EmberTest :
     FunSpec({
@@ -27,6 +29,11 @@ class EmberTest :
                             override fun compareTo(other: Version): Int = toString().compareTo(other.toString())
 
                             override fun toString(): String = "9.9.9"
+                        }
+
+                    override val flagManager =
+                        object : FlagManager {
+                            override fun isSet(flag: Flag) = false
                         }
                 }
             server.servicesManager.register(Ember::class.java, fakeEmber, fakePlugin, ServicePriority.Highest)
