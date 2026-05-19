@@ -29,7 +29,7 @@ mint broken-links
 ## Structure
 
 - `docs.json`: site config and navigation.
-- `index.mdx`: landing page.
+- `index.mdx`, `changelog.mdx`, `reporting-bugs.mdx`, `license.mdx`: top-level pages (Home tab).
 - `players/`: pages for people playing on a server running Ember.
 - `server-owners/`: pages for people running a server with Ember installed.
 - `developers/`: pages for plugin developers integrating with the Ember API.

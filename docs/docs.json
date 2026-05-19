@@ -11,6 +11,25 @@
   "navigation": {
     "tabs": [
       {
+        "tab": "Home",
+        "groups": [
+          {
+            "group": "Welcome",
+            "pages": [
+              "index"
+            ]
+          },
+          {
+            "group": "Project",
+            "pages": [
+              "changelog",
+              "reporting-bugs",
+              "license"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Players",
         "groups": [
           {
