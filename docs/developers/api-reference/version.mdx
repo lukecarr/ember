@@ -1,6 +1,6 @@
 ---
 title: "Version"
-description: "sh.carr.ember.Version — a comparable version handle."
+description: "The sh.carr.ember.Version interface, a comparable version handle."
 ---
 
 ```kotlin
@@ -11,13 +11,13 @@ interface Version : Comparable<Version> {
 }
 ```
 
-`Version` represents the running Ember version. It implements `Comparable<Version>` so two versions can be ordered against each other, and `toString()` returns a SemVer-style string — for example, `0.1.0-alpha.1`.
+`Version` represents the running Ember version. It implements `Comparable<Version>` so two versions can be ordered against each other, and `toString()` returns a SemVer-style string (for example, `0.1.0-alpha.1`).
 
 ## Members
 
 ### `compareTo(other: Version)` (inherited from `Comparable`)
 
-Standard `Comparable` semantics — returns a negative number, zero, or a positive number depending on whether `this` is less than, equal to, or greater than `other`.
+Standard `Comparable` semantics: returns a negative number, zero, or a positive number depending on whether `this` is less than, equal to, or greater than `other`.
 
 Ordering follows [Semantic Versioning 2.0.0](https://semver.org/) precedence rules.
 
@@ -37,5 +37,5 @@ logger.info("Ember $running is available")
 ```
 
 <Note>
-  Today, `Version` instances come from `Ember.instance.version` — there is no public constructor or factory yet, so consumers can read the running version but can't synthesise a `Version` to compare against. As use cases for version-gating land, the API will grow to support them.
+  Today, `Version` instances come from `Ember.instance.version`. There is no public constructor or factory yet, so consumers can read the running version but can't synthesise a `Version` to compare against. As use cases for version-gating land, the API will grow to support them.
 </Note>

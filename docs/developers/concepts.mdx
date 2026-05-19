@@ -7,7 +7,7 @@ description: "How the Ember API is shaped."
 
 Ember exposes its API through Bukkit's `ServicesManager`. At startup, the plugin registers itself as the provider for the `sh.carr.ember.Ember` interface at the highest priority.
 
-To get a handle on the running instance you don't need to look up Ember's plugin class — you ask the services manager, or use the convenience accessor on the interface itself.
+To get a handle on the running instance you don't need to look up Ember's plugin class. Ask the services manager, or use the convenience accessor on the interface itself.
 
 <CodeGroup>
 
@@ -25,13 +25,13 @@ Ember ember = Ember.getInstance();
 
 </CodeGroup>
 
-The `instance` accessor is equivalent to `Bukkit.getServer().getServicesManager().getRegistration(Ember.class).getProvider()`. Use it any time after Ember has loaded — declare Ember as a [required dependency](/developers/quickstart#declare-ember-as-a-dependency) of your plugin so the lookup is always safe.
+The `instance` accessor is equivalent to `Bukkit.getServer().getServicesManager().getRegistration(Ember.class).getProvider()`. Use it any time after Ember has loaded. Declare Ember as a [required dependency](/developers/quickstart#declare-ember-as-a-dependency) of your plugin so the lookup is always safe.
 
 ## Compatibility
 
 Ember is built against the Paper API and marked `folia-supported: true`. The same jar runs on both Paper and Folia without changes, and so does any plugin that consumes the Ember API.
 
-If your plugin needs to integrate with Ember on Folia, use Folia's scheduler APIs as you normally would — nothing about the Ember API requires the main thread.
+If your plugin needs to integrate with Ember on Folia, use Folia's scheduler APIs as you normally would. Nothing about the Ember API requires the main thread.
 
 ## Versioning
 
