@@ -2,6 +2,7 @@ accessor
 APIs
 bukkit
 folia
+Javadocs
 minecraft
 repo
 subcommand

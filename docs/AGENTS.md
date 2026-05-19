@@ -33,6 +33,20 @@ When adding a page, pick the audience first. That determines the tab and the ton
 - Backticks for commands, permission nodes, file names, and code references.
 - Reflect the plugin's current state honestly. If a section is bare-bones because the plugin is still alpha, say so rather than padding it.
 
+## "Since" annotations
+
+Commands, features, and public API types include a "Since" line that names the Ember release they were introduced in. Readers can tell at a glance whether the build of Ember they have supports something.
+
+**Per-page convention.** Directly under the frontmatter, before the first paragraph of body content, add a line of the form:
+
+    **Since** `v0.1.0-alpha.1`
+
+Use this on per-command pages and per-type API reference pages.
+
+**Per-row convention.** Tables that list multiple items (for example, the permissions reference) include a `Since` column. Each row's value is the version that item was introduced in.
+
+Use the exact release tag from the [changelog](changelog.mdx). When a member changes meaningfully in a later release, add a follow-up note rather than overwriting the original `Since`.
+
 ## Patterns to avoid
 
 These read as AI-generated and undermine credibility. Cut them, even when it costs an extra sentence.
