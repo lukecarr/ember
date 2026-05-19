@@ -1,0 +1,17 @@
+{
+  "name": "ember-e2e",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "bun": ">=1.2.0"
+  },
+  "scripts": {
+    "test": "bun run scripts/run.ts"
+  },
+  "dependencies": {
+    "mineflayer": "^4.20.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.0"
+  }
+}

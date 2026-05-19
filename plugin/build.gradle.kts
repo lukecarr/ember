@@ -131,4 +131,22 @@ tasks {
     jacocoTestCoverageVerification {
         classDirectories.setFrom(jacocoTestReport.get().classDirectories)
     }
+
+    val stageE2EPlugin =
+        register<Sync>("stageE2EPlugin") {
+            from(shadowJar.flatMap { it.archiveFile })
+            into(rootProject.file("e2e/build/plugins"))
+            rename { "ember.jar" }
+        }
+
+    register<Exec>("e2eTest") {
+        group = "verification"
+        description =
+            "Runs Mineflayer + Docker E2E tests against the built plugin. Requires bun (https://bun.sh) and Docker."
+        dependsOn(stageE2EPlugin)
+
+        workingDir = rootProject.file("e2e")
+        commandLine("bun", "run", "test")
+        environment("EMBER_VERSION", project.version.toString())
+    }
 }

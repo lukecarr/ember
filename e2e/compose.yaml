@@ -1,0 +1,22 @@
+services:
+  paper:
+    image: itzg/minecraft-server:java25
+    environment:
+      EULA: "TRUE"
+      TYPE: PAPER
+      VERSION: "26.1.2"
+      ONLINE_MODE: "FALSE"
+      MEMORY: 2G
+      VIEW_DISTANCE: "4"
+      LEVEL_TYPE: FLAT
+    ports:
+      - "127.0.0.1:25565:25565"
+    volumes:
+      - ./build/plugins:/plugins:ro
+      - ./server/ops.json:/data/ops.json:ro
+    healthcheck:
+      test: [ "CMD", "mc-health" ]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
