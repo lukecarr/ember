@@ -20,12 +20,6 @@
             ]
           },
           {
-            "group": "Reference",
-            "pages": [
-              "players/commands"
-            ]
-          },
-          {
             "group": "Guides",
             "pages": [
               "players/guides/index"
@@ -74,6 +68,23 @@
               "developers/api-reference/index",
               "developers/api-reference/ember",
               "developers/api-reference/version"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Commands",
+        "groups": [
+          {
+            "group": "Getting started",
+            "pages": [
+              "commands/index"
+            ]
+          },
+          {
+            "group": "Miscellaneous",
+            "pages": [
+              "commands/version"
             ]
           }
         ]
