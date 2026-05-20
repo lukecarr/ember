@@ -3,6 +3,7 @@ package sh.carr.ember.plugin.command
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.CommandDispatcher
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -10,20 +11,43 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.command.CommandSender
 import sh.carr.ember.flag.FlagManager
 import sh.carr.ember.plugin.flag.Flags
 
+private val plain = PlainTextComponentSerializer.plainText()
+
+/** Plain text of [c], plus the plain text of any hover-on-text contents found anywhere in the tree. */
+private fun visibleAndHover(c: Component): String {
+    val sb = StringBuilder()
+    sb.append(plain.serialize(c))
+
+    fun walk(component: Component) {
+        (component.style().hoverEvent())?.let { hover ->
+            if (hover.action() == HoverEvent.Action.SHOW_TEXT) {
+                val value = hover.value()
+                if (value is Component) {
+                    sb.append(" [hover: ")
+                    sb.append(plain.serialize(value))
+                    sb.append("]")
+                }
+            }
+        }
+        component.children().forEach { walk(it) }
+    }
+    walk(c)
+    return sb.toString()
+}
+
 private fun captureMessages(
     source: CommandSourceStack,
     sender: CommandSender,
-): MutableList<String> {
-    val captured = mutableListOf<String>()
+): MutableList<Component> {
+    val captured = mutableListOf<Component>()
     every { source.sender } returns sender
-    every { sender.sendMessage(any<Component>()) } answers {
-        captured.add(PlainTextComponentSerializer.plainText().serialize(firstArg()))
-    }
+    every { sender.sendMessage(any<Component>()) } answers { captured.add(firstArg()) }
     return captured
 }
 
@@ -69,19 +93,19 @@ class FlagsCommandTest :
                 val source = mockk<CommandSourceStack>()
                 val sender = mockk<CommandSender>()
                 every { sender.hasPermission(Permissions.FLAGS) } returns true
-                val messages = captureMessages(source, sender)
+                val captured = captureMessages(source, sender)
 
                 val dispatcher = CommandDispatcher<CommandSourceStack>()
                 dispatcher.register(FlagsCommand.node(mgr))
                 dispatcher.execute("flags list", source) shouldBe Command.SINGLE_SUCCESS
 
-                messages.size shouldBe 1 + Flags.entries.size
-                messages[0] shouldBe "Flags:"
+                captured shouldHaveSize (1 + Flags.entries.size)
+                plain.serialize(captured[0]) shouldBe "Flags:"
                 Flags.entries.forEachIndexed { i, flag ->
-                    val line = messages[i + 1]
-                    line.contains(flag.id) shouldBe true
-                    line.contains("[enabled]") shouldBe true
-                    line.contains(flag.description) shouldBe true
+                    val combined = visibleAndHover(captured[i + 1])
+                    combined.contains(flag.id) shouldBe true
+                    combined.contains("✔") shouldBe true
+                    combined.contains(flag.description) shouldBe true
                 }
             }
 
@@ -92,13 +116,13 @@ class FlagsCommandTest :
                 val source = mockk<CommandSourceStack>()
                 val sender = mockk<CommandSender>()
                 every { sender.hasPermission(Permissions.FLAGS) } returns true
-                val messages = captureMessages(source, sender)
+                val captured = captureMessages(source, sender)
 
                 val dispatcher = CommandDispatcher<CommandSourceStack>()
                 dispatcher.register(FlagsCommand.node(mgr))
                 dispatcher.execute("flags list", source) shouldBe Command.SINGLE_SUCCESS
 
-                messages.drop(1).forEach { it.contains("[disabled]") shouldBe true }
+                captured.drop(1).forEach { plain.serialize(it).contains("✘") shouldBe true }
             }
         }
 
@@ -111,13 +135,13 @@ class FlagsCommandTest :
                 val source = mockk<CommandSourceStack>()
                 val sender = mockk<CommandSender>()
                 every { sender.hasPermission(Permissions.FLAGS) } returns true
-                val messages = captureMessages(source, sender)
+                val captured = captureMessages(source, sender)
 
                 val dispatcher = CommandDispatcher<CommandSourceStack>()
                 dispatcher.register(FlagsCommand.node(mgr))
                 dispatcher.execute("flags get command.version", source) shouldBe Command.SINGLE_SUCCESS
 
-                val joined = messages.joinToString("\n")
+                val joined = captured.joinToString("\n") { visibleAndHover(it) }
                 joined.contains("command.version") shouldBe true
                 joined.contains(Flags.VersionCommand.description) shouldBe true
                 joined.contains("Default: enabled") shouldBe true
@@ -133,13 +157,13 @@ class FlagsCommandTest :
                 val source = mockk<CommandSourceStack>()
                 val sender = mockk<CommandSender>()
                 every { sender.hasPermission(Permissions.FLAGS) } returns true
-                val messages = captureMessages(source, sender)
+                val captured = captureMessages(source, sender)
 
                 val dispatcher = CommandDispatcher<CommandSourceStack>()
                 dispatcher.register(FlagsCommand.node(mgr))
                 dispatcher.execute("flags get command.version", source) shouldBe Command.SINGLE_SUCCESS
 
-                val joined = messages.joinToString("\n")
+                val joined = captured.joinToString("\n") { visibleAndHover(it) }
                 joined.contains("Default: enabled") shouldBe true
                 joined.contains("Operator: set") shouldBe true
                 joined.contains("State: disabled") shouldBe true

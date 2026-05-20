@@ -21,6 +21,7 @@ val kotlinVersion: String by project
 dependencies {
     implementation(project(":api"))
     paperweight.paperDevBundle(paperApiVersion)
+    implementation("com.github.ben-manes.caffeine:caffeine:3.2.4")
 
     testImplementation("io.papermc.paper:paper-api:26.1.2.build.57-stable")
     testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v26.1.2:4.113.1")
@@ -101,9 +102,7 @@ tasks {
         archiveClassifier = ""
         mergeServiceFiles()
 
-        dependencies {
-            include(project(":api"))
-        }
+        relocate("com.github.benmanes.caffeine", "sh.carr.ember.shaded.caffeine")
     }
 
     jar {

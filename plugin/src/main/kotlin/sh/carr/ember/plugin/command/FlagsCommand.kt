@@ -4,16 +4,14 @@ import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
-import net.kyori.adventure.text.minimessage.MiniMessage
 import sh.carr.ember.Ember
 import sh.carr.ember.flag.Flag
 import sh.carr.ember.flag.FlagManager
 import sh.carr.ember.plugin.command.argument.FlagArgumentType.Companion.flag
 import sh.carr.ember.plugin.flag.Flags
+import sh.carr.ember.plugin.msg
 
 object FlagsCommand : Subcommand {
-    private val mm = MiniMessage.miniMessage()
-
     override fun node(): LiteralArgumentBuilder<CommandSourceStack> = node(Ember.instance.flagManager)
 
     /** Builds the node against an explicit [flagManager]. Useful for tests. */
@@ -46,11 +44,11 @@ object FlagsCommand : Subcommand {
         source: CommandSourceStack,
         flagManager: FlagManager,
     ) {
-        source.sender.sendMessage(mm.deserialize("<white>Flags:</white>"))
+        source.sender.msg("<white>Flags:</white>")
         Flags.entries.forEach { flag ->
-            val badge = if (flagManager.isEnabled(flag)) "<green>[enabled]</green>" else "<red>[disabled]</red>"
-            source.sender.sendMessage(
-                mm.deserialize("  $badge <white>${flag.id}</white> <gray>— ${flag.description}</gray>"),
+            val badge = if (flagManager.isEnabled(flag)) "<green><b>✔</b></green>" else "<red><b>✘</b></red>"
+            source.sender.msg(
+                "  $badge <white><hover:show_text:'${flag.description}'>${flag.id}</hover></white>",
             )
         }
     }
@@ -66,10 +64,9 @@ object FlagsCommand : Subcommand {
         val stateColor = if (enabled) "green" else "red"
         val stateLabel = if (enabled) "enabled" else "disabled"
 
-        source.sender.sendMessage(mm.deserialize("<white>${flag.id}</white>"))
-        source.sender.sendMessage(mm.deserialize("  <gray>Description:</gray> ${flag.description}"))
-        source.sender.sendMessage(mm.deserialize("  <gray>Default:</gray> $defaultLabel"))
-        source.sender.sendMessage(mm.deserialize("  <gray>Operator:</gray> $operatorLabel"))
-        source.sender.sendMessage(mm.deserialize("  <gray>State:</gray> <$stateColor>$stateLabel</$stateColor>"))
+        source.sender.msg(
+            "<white>${flag.id}</white>  <gray>State:</gray> <$stateColor><hover:show_text:'<gray>Default:</gray> $defaultLabel  <gray>Operator:</gray> $operatorLabel'>$stateLabel</hover></$stateColor>",
+        )
+        source.sender.msg("  <gray>${flag.description}</gray>")
     }
 }
