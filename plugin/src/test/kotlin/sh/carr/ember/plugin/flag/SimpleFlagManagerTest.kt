@@ -53,6 +53,39 @@ class SimpleFlagManagerTest :
             }
         }
 
+        context("loadFromFile") {
+            test("loads each non-blank line from the file") {
+                val mgr = SimpleFlagManager()
+                val file =
+                    kotlin.io.path
+                        .createTempFile("flags", ".txt")
+                        .toFile()
+                file.deleteOnExit()
+                file.writeText("command.version\n")
+                mgr.loadFromFile(file)
+                mgr.isSet(testFlag("command.version")) shouldBe true
+            }
+
+            test("lowercases and trims lines before matching") {
+                val mgr = SimpleFlagManager()
+                val file =
+                    kotlin.io.path
+                        .createTempFile("flags", ".txt")
+                        .toFile()
+                file.deleteOnExit()
+                file.writeText("  Command.Version  \n")
+                mgr.loadFromFile(file)
+                mgr.isSet(testFlag("command.version")) shouldBe true
+            }
+
+            test("is a no-op when the file does not exist") {
+                val mgr = SimpleFlagManager()
+                val file = java.io.File("/this/path/does/not/exist/${java.util.UUID.randomUUID()}")
+                mgr.loadFromFile(file)
+                mgr.isSet(testFlag("anything")) shouldBe false
+            }
+        }
+
         context("inherited isEnabled wiring") {
             test("default-on flag resolves to enabled when nothing is loaded") {
                 val mgr = SimpleFlagManager()

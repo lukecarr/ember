@@ -3,6 +3,7 @@ package sh.carr.ember.plugin
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeSameInstanceAs
 import io.kotest.matchers.types.shouldNotBeSameInstanceAs
 import io.mockk.mockk
@@ -125,6 +126,13 @@ class MsgTest :
                 Msg.invalidateAll()
                 Msg.of(staticKey) shouldNotBeSameInstanceAs staticFirst
                 Msg.ofKeyed(keyedKey, "x") shouldNotBeSameInstanceAs keyedFirst
+            }
+        }
+
+        context("cache stats accessors") {
+            test("staticStats and keyedStats return Caffeine CacheStats") {
+                Msg.staticStats() shouldNotBe null
+                Msg.keyedStats() shouldNotBe null
             }
         }
 

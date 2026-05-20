@@ -58,11 +58,11 @@ object FlagsCommand : Subcommand {
         flagManager: FlagManager,
         flag: Flag,
     ) {
-        val defaultLabel = if (flag.enabledByDefault) "enabled" else "disabled"
+        val defaultLabel = enabledLabel(flag.enabledByDefault)
         val operatorLabel = if (flagManager.isSet(flag)) "set" else "unset"
         val enabled = flagManager.isEnabled(flag)
         val stateColor = if (enabled) "green" else "red"
-        val stateLabel = if (enabled) "enabled" else "disabled"
+        val stateLabel = enabledLabel(enabled)
 
         source.sender.msg(
             "<white>${flag.id}</white>  <gray>State:</gray> <$stateColor><hover:show_text:'<gray>Default:</gray> $defaultLabel  <gray>Operator:</gray> $operatorLabel'>$stateLabel</hover></$stateColor>",
@@ -70,3 +70,6 @@ object FlagsCommand : Subcommand {
         source.sender.msg("  <gray>${flag.description}</gray>")
     }
 }
+
+/** Maps an enabled/disabled boolean to its user-facing label. */
+internal fun enabledLabel(enabled: Boolean): String = if (enabled) "enabled" else "disabled"

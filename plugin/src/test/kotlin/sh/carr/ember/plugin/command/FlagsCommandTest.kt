@@ -168,9 +168,15 @@ class FlagsCommandTest :
                 joined.contains("Operator: set") shouldBe true
                 joined.contains("State: disabled") shouldBe true
             }
+        }
 
-            // The default-off branch of the Default: line isn't exercisable today because the only
-            // catalog entry (Flags.VersionCommand) is default-on. When a default-off flag is added
-            // to Flags, an analogous test against that flag closes the gap.
+        context("enabledLabel") {
+            test("returns 'enabled' when true") {
+                enabledLabel(true) shouldBe "enabled"
+            }
+
+            test("returns 'disabled' when false") {
+                enabledLabel(false) shouldBe "disabled"
+            }
         }
     })

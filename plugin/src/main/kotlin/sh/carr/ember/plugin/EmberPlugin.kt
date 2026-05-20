@@ -18,10 +18,7 @@ open class EmberPlugin :
             event.registrar().register(EmberCommand.node())
         }
 
-        val file = File(dataFolder, "flags.txt")
-        if (file.exists()) {
-            flagManager.load(file.readLines().map { it.lowercase().trim() })
-        }
+        flagManager.loadFromFile(File(dataFolder, "flags.txt"))
     }
 
     override val version = SemVer.parse(pluginMeta.version)
