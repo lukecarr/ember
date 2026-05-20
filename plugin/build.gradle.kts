@@ -21,6 +21,7 @@ val kotlinVersion: String by project
 dependencies {
     implementation(project(":api"))
     paperweight.paperDevBundle(paperApiVersion)
+    implementation("com.github.ben-manes.caffeine:caffeine:3.2.4")
 
     testImplementation("io.papermc.paper:paper-api:26.1.2.build.57-stable")
     testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v26.1.2:4.113.1")
@@ -45,6 +46,10 @@ paperPluginYaml {
     permissions {
         register("ember.version") {
             description.set("Check the running Ember version")
+            default.set(Permission.Default.OP)
+        }
+        register("ember.flags") {
+            description.set("List and inspect Ember feature flags")
             default.set(Permission.Default.OP)
         }
     }
@@ -99,7 +104,10 @@ tasks {
 
         dependencies {
             include(project(":api"))
+            include(dependency("com.github.ben-manes.caffeine:.*"))
         }
+
+        relocate("com.github.benmanes.caffeine", "sh.carr.ember.shaded.caffeine")
     }
 
     jar {
@@ -120,6 +128,7 @@ tasks {
                 classDirectories.files.map {
                     fileTree(it) {
                         exclude(
+                            "**/*\$DefaultImpls.class",
                             "sh/carr/ember/plugin/command/Permissions*.class",
                             "sh/carr/ember/plugin/EmberPluginLoader*.class",
                         )

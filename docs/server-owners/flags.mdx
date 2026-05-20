@@ -1,0 +1,44 @@
+---
+title: "Feature flags"
+description: "Toggle parts of Ember on or off."
+---
+
+Some Ember features are gated by named feature flags. As a server owner, you can override each flag's default state at startup by listing it in `flags.txt`. The current state of every flag is visible in-game via [`/ember flags`](/commands/flags).
+
+## How a flag resolves
+
+Each flag has three pieces of metadata:
+
+- An **id** (for example, `command.version`). This is what you write in `flags.txt`.
+- A **description** explaining what the flag gates.
+- A **default state**, `enabled` or `disabled`.
+
+A flag is either **set** or **unset**. Setting a flag inverts its default. A default-enabled feature becomes disabled when its flag is set. A default-disabled feature (typically an experimental one) becomes enabled when its flag is set.
+
+Each line in `flags.txt` flips the named flag from its default. The same file enables some features and disables others, depending on each flag's default.
+
+## `flags.txt`
+
+The file lives at `plugins/Ember/flags.txt`. Create it if it doesn't exist. Put one flag id per line:
+
+```
+command.version
+```
+
+Ember reads the file once during startup. Restart the server to pick up changes.
+
+Lines are lowercased and trimmed before they're matched.
+
+Blank lines and lines that don't match a known flag id are ignored. Lines that start with `#` are comments, and also ignored.
+
+## Flag reference
+
+The catalog as of `v0.1.0-alpha.2` is below. For the running plugin's view (including any flags added in newer releases), run `/ember flags list` in-game.
+
+| Flag id           | Description                                                            | Default   | Since            |
+|-------------------|------------------------------------------------------------------------|-----------|------------------|
+| `command.version` | Gate registration of the `/ember version` subcommand.                  | `enabled` | `v0.1.0-alpha.2` |
+
+## Inspecting flags in-game
+
+`/ember flags list` prints every flag with its current state. `/ember flags get <flag>` prints the full details for a single flag, including whether the flag is set and how it resolved. Both are gated on the `ember.flags` permission. See the [`/ember flags`](/commands/flags) command reference.

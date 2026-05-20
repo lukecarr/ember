@@ -1,0 +1,59 @@
+---
+title: "/ember flags"
+description: "List and inspect Ember feature flags in-game."
+---
+
+**Since** `v0.1.0-alpha.2`
+
+Read-only commands for inspecting Ember's feature flag catalog. See [feature flags](/server-owners/flags) for the conceptual overview.
+
+## `/ember flags list`
+
+Print every registered flag with its current resolved state and description.
+
+### Syntax
+
+```
+/ember flags list
+```
+
+### Permission
+
+`ember.flags` (granted to operators by default). See the [permissions reference](/server-owners/permissions) for details on granting it to players.
+
+### Example
+
+```
+> /ember flags list
+Flags:
+  [enabled] command.version — The /ember version subcommand, which reports the running plugin version.
+```
+
+## `/ember flags get`
+
+Print the full details of a single flag: its description, default state, whether you've set the flag in `flags.txt`, and the resolved state.
+
+### Syntax
+
+```
+/ember flags get <flag>
+```
+
+The `<flag>` argument tab-completes against the registered flag ids. An unknown id is rejected at parse time with `Unknown flag: <id>`.
+
+### Permission
+
+`ember.flags` (granted to operators by default).
+
+### Example
+
+```
+> /ember flags get command.version
+command.version
+  Description: The /ember version subcommand, which reports the running plugin version.
+  Default: enabled
+  Operator: unset
+  State: enabled
+```
+
+`Operator` tells you whether the flag id appears in `flags.txt`. `State` is the value the plugin acts on: it matches `Default` when `Operator` is `unset`, and is the opposite of `Default` when `Operator` is `set`.
