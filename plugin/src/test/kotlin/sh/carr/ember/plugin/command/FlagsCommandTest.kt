@@ -8,7 +8,6 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.HoverEvent
@@ -73,15 +72,16 @@ class FlagsCommandTest :
                 val source = mockk<CommandSourceStack>()
                 val sender = mockk<CommandSender>()
                 every { source.sender } returns sender
-                val granted = slot<String>()
-                every { sender.hasPermission(capture(granted)) } returns true
+                val grantedCalls = mutableListOf<String>()
+                every { sender.hasPermission(capture(grantedCalls)) } returns true
 
                 val built = FlagsCommand.node(mgr).build()
                 built.getChild("list").requirement.test(source) shouldBe true
-                granted.captured shouldBe Permissions.FLAGS
-
                 built.getChild("get").requirement.test(source) shouldBe true
-                granted.captured shouldBe Permissions.FLAGS
+
+                // Asserting the exact list catches a regression where `get`'s requirement stops
+                // calling hasPermission (a single-slot capture would silently retain `list`'s value).
+                grantedCalls shouldBe listOf(Permissions.FLAGS, Permissions.FLAGS)
             }
         }
 

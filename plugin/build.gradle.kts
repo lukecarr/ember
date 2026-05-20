@@ -102,6 +102,11 @@ tasks {
         archiveClassifier = ""
         mergeServiceFiles()
 
+        dependencies {
+            include(project(":api"))
+            include(dependency("com.github.ben-manes.caffeine:.*"))
+        }
+
         relocate("com.github.benmanes.caffeine", "sh.carr.ember.shaded.caffeine")
     }
 

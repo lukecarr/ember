@@ -78,6 +78,33 @@ class SimpleFlagManagerTest :
                 mgr.isSet(testFlag("command.version")) shouldBe true
             }
 
+            test("ignores blank lines") {
+                val mgr = SimpleFlagManager()
+                val file =
+                    kotlin.io.path
+                        .createTempFile("flags", ".txt")
+                        .toFile()
+                file.deleteOnExit()
+                file.writeText("command.version\n\n   \n")
+                mgr.loadFromFile(file)
+                mgr.isSet(testFlag("command.version")) shouldBe true
+                mgr.isSet(testFlag("")) shouldBe false
+            }
+
+            test("ignores comment lines starting with #") {
+                val mgr = SimpleFlagManager()
+                val file =
+                    kotlin.io.path
+                        .createTempFile("flags", ".txt")
+                        .toFile()
+                file.deleteOnExit()
+                file.writeText("# header comment\ncommand.version\n#trailing comment\n")
+                mgr.loadFromFile(file)
+                mgr.isSet(testFlag("command.version")) shouldBe true
+                mgr.isSet(testFlag("# header comment")) shouldBe false
+                mgr.isSet(testFlag("#trailing comment")) shouldBe false
+            }
+
             test("is a no-op when the file does not exist") {
                 val mgr = SimpleFlagManager()
                 val file = java.io.File("/this/path/does/not/exist/${java.util.UUID.randomUUID()}")

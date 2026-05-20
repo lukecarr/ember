@@ -7,8 +7,10 @@ import java.io.File
 /**
  * In-memory [FlagManager] backed by a [HashSet] of flag identifiers.
  *
- * The plugin populates the set at startup via [load] or [loadFromFile]. The set is not safe for
- * concurrent modification once command registration has run.
+ * The plugin populates the set at startup via [load] or [loadFromFile]. No further modification is
+ * permitted after the plugin has registered itself as a service: that publication establishes the
+ * happens-before edge that subsequent reads from arbitrary threads rely on. Reads alone against a
+ * [HashSet] are safe once that edge exists; later writes would invalidate it.
  */
 class SimpleFlagManager : FlagManager {
     private val flags = HashSet<String>()
@@ -30,7 +32,12 @@ class SimpleFlagManager : FlagManager {
      */
     fun loadFromFile(file: File) {
         if (file.exists()) {
-            load(file.readLines().map { it.lowercase().trim() }.filter { it.isNotBlank() || it.startsWith("#") })
+            load(
+                file
+                    .readLines()
+                    .map { it.lowercase().trim() }
+                    .filter { it.isNotBlank() && !it.startsWith("#") },
+            )
         }
     }
 }

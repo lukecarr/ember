@@ -4,12 +4,14 @@ import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import sh.carr.ember.Ember
 import sh.carr.ember.flag.Flag
 import sh.carr.ember.flag.FlagManager
 import sh.carr.ember.plugin.command.argument.FlagArgumentType.Companion.flag
 import sh.carr.ember.plugin.flag.Flags
 import sh.carr.ember.plugin.msg
+import sh.carr.ember.plugin.msgKeyed
 
 object FlagsCommand : Subcommand {
     override fun node(): LiteralArgumentBuilder<CommandSourceStack> = node(Ember.instance.flagManager)
@@ -46,9 +48,17 @@ object FlagsCommand : Subcommand {
     ) {
         source.sender.msg("<white>Flags:</white>")
         Flags.entries.forEach { flag ->
-            val badge = if (flagManager.isEnabled(flag)) "<green><b>✔</b></green>" else "<red><b>✘</b></red>"
-            source.sender.msg(
-                "  $badge <white><hover:show_text:'${flag.description}'>${flag.id}</hover></white>",
+            val enabled = flagManager.isEnabled(flag)
+            val badge = if (enabled) "<green><b>✔</b></green>" else "<red><b>✘</b></red>"
+            // Cache key encodes every variable affecting the rendered component: the flag id
+            // (which determines flag.description, immutable per flag) and the enabled state
+            // (which selects the badge). The static catalog plus binary state means at most
+            // 2 cache entries per flag, reused across every /ember flags list invocation.
+            source.sender.msgKeyed(
+                "flags.list.${flag.id}.${enabledLabel(enabled)}",
+                "  $badge <white><hover:show_text:'<description>'><id></hover></white>",
+                Placeholder.unparsed("id", flag.id),
+                Placeholder.unparsed("description", flag.description),
             )
         }
     }
@@ -64,10 +74,22 @@ object FlagsCommand : Subcommand {
         val stateColor = if (enabled) "green" else "red"
         val stateLabel = enabledLabel(enabled)
 
-        source.sender.msg(
-            "<white>${flag.id}</white>  <gray>State:</gray> <$stateColor><hover:show_text:'<gray>Default:</gray> $defaultLabel  <gray>Operator:</gray> $operatorLabel'>$stateLabel</hover></$stateColor>",
+        // flag.enabledByDefault is immutable per flag, so defaultLabel is determined by id alone.
+        // enabled is determined by (default XOR isSet), which collapses to isSet for cache-key
+        // purposes once id is fixed. So (id, isSet) captures every variable in this rendering.
+        source.sender.msgKeyed(
+            "flags.get.line.${flag.id}.$operatorLabel",
+            "<white><id></white>  <gray>State:</gray> <$stateColor>" +
+                "<hover:show_text:'<gray>Default:</gray> $defaultLabel  <gray>Operator:</gray> $operatorLabel'>" +
+                "$stateLabel</hover></$stateColor>",
+            Placeholder.unparsed("id", flag.id),
         )
-        source.sender.msg("  <gray>${flag.description}</gray>")
+        // Description line is purely per-flag; never varies with state.
+        source.sender.msgKeyed(
+            "flags.get.description.${flag.id}",
+            "  <gray><description></gray>",
+            Placeholder.unparsed("description", flag.description),
+        )
     }
 }
 

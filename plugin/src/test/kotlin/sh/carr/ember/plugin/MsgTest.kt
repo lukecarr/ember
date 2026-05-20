@@ -154,4 +154,36 @@ class MsgTest :
                 sent.captured shouldBeSameInstanceAs Msg.of(key)
             }
         }
+
+        context("CommandSender.msgKeyed(cacheKey, message, vararg resolvers) extension") {
+            test("sends the Component produced by Msg.ofKeyed and caches under the key") {
+                val sender = mockk<CommandSender>()
+                val sent = slot<Component>()
+                io.mockk.every { sender.sendMessage(capture(sent)) } returns Unit
+                val key = "msg-test-sender-keyed-${java.util.UUID.randomUUID()}"
+                sender.msgKeyed(key, "Hello <name>", Placeholder.unparsed("name", "world"))
+                sent.captured shouldBeSameInstanceAs Msg.ofKeyed(key, "ignored-template")
+                plain.serialize(sent.captured) shouldBe "Hello world"
+            }
+        }
+
+        context("CommandSender.msg(message, vararg resolvers) extension") {
+            test("renders with resolvers and sends the resulting Component") {
+                val sender = mockk<CommandSender>()
+                val sent = slot<Component>()
+                io.mockk.every { sender.sendMessage(capture(sent)) } returns Unit
+                sender.msg("Hello <name>", Placeholder.unparsed("name", "world"))
+                plain.serialize(sent.captured) shouldBe "Hello world"
+            }
+
+            test("treats resolver values as plain text (no MiniMessage parsing)") {
+                val sender = mockk<CommandSender>()
+                val sent = slot<Component>()
+                io.mockk.every { sender.sendMessage(capture(sent)) } returns Unit
+                sender.msg("<value>", Placeholder.unparsed("value", "<red>not red</red>"))
+                // Placeholder.unparsed inserts the value as plain text, so the <red> tag should
+                // remain literal in the rendered text, not be parsed as a color tag.
+                plain.serialize(sent.captured) shouldBe "<red>not red</red>"
+            }
+        }
     })

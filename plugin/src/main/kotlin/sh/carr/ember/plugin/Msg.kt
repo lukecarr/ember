@@ -108,3 +108,23 @@ object Msg {
 fun String.msg() = Msg.of(this)
 
 fun CommandSender.msg(message: String) = sendMessage(Msg.of(message))
+
+/**
+ * Ergonomic extension for resolved MiniMessage. Not cached, since [resolvers] have no reliable
+ * equals/hashCode. Use this when you need to inject untrusted text via [TagResolver]s like
+ * `Placeholder.unparsed`.
+ */
+fun CommandSender.msg(
+    message: String,
+    vararg resolvers: TagResolver,
+) = sendMessage(Msg.of(message, *resolvers))
+
+/**
+ * Ergonomic extension for cached, resolved MiniMessage. Routes through [Msg.ofKeyed], so [cacheKey]
+ * MUST encode every variable that affects the resolved output (typically the resolver values).
+ */
+fun CommandSender.msgKeyed(
+    cacheKey: String,
+    message: String,
+    vararg resolvers: TagResolver,
+) = sendMessage(Msg.ofKeyed(cacheKey, message, *resolvers))
