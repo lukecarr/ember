@@ -27,7 +27,9 @@ command.version
 
 Ember reads the file once during startup. Restart the server to pick up changes.
 
-Lines are lowercased and trimmed before they're matched. Blank lines and lines that don't match a known flag id are ignored. Comment characters aren't recognized today.
+Lines are lowercased and trimmed before they're matched.
+
+Blank lines and lines that don't match a known flag id are ignored. Lines that start with `#` are comments, and also ignored.
 
 ## Flag reference
 

@@ -25,10 +25,12 @@ class SimpleFlagManager : FlagManager {
     /**
      * Loads flag ids from [file] if it exists. Lines are lowercased and trimmed before they're
      * matched. A missing file is a no-op.
+     *
+     * Blank lines or lines prefixed with `#` (comments) are ignored.
      */
     fun loadFromFile(file: File) {
         if (file.exists()) {
-            load(file.readLines().map { it.lowercase().trim() })
+            load(file.readLines().map { it.lowercase().trim() }.filter { it.isNotBlank() || it.startsWith("#") })
         }
     }
 }
