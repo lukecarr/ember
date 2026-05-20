@@ -1,6 +1,7 @@
 package sh.carr.ember
 
 import org.bukkit.Bukkit
+import sh.carr.ember.flag.FlagManager
 
 interface Ember {
     companion object {
@@ -14,4 +15,7 @@ interface Ember {
     }
 
     val version: Version
+
+    /** Resolves feature flag state for this plugin instance. */
+    val flagManager: FlagManager
 }

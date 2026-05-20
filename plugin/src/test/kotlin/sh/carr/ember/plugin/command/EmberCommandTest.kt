@@ -13,4 +13,8 @@ class EmberCommandTest :
         test("registers 'version' as a child") {
             EmberCommand.node().getChild("version").shouldNotBeNull()
         }
+
+        test("registers 'flags' as a child") {
+            EmberCommand.node().getChild("flags").shouldNotBeNull()
+        }
     })

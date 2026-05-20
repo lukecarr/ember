@@ -1,0 +1,62 @@
+---
+title: "Ember"
+description: "The Ember interface, the API entry point."
+---
+
+**Since** `v0.1.0-alpha.1`
+
+```kotlin
+package sh.carr.ember
+
+interface Ember {
+    val version: Version
+
+    companion object {
+        @JvmStatic
+        val instance: Ember
+    }
+}
+```
+
+`Ember` is the entry point to the API. It's registered as a Bukkit service by the plugin at startup, so any plugin loaded after Ember can resolve it.
+
+## Members
+
+### `version: Version`
+
+The running plugin version, as a [`Version`](/developers/api-reference/version).
+
+```kotlin
+val running = Ember.instance.version
+```
+
+### `Ember.instance` (companion)
+
+A convenience accessor that resolves the registered service.
+
+<CodeGroup>
+
+```kotlin Kotlin
+val ember = Ember.instance
+```
+
+```java Java
+Ember ember = Ember.getInstance();
+```
+
+</CodeGroup>
+
+Internally, this calls `Bukkit.getServer().getServicesManager().getRegistration(Ember.class).getProvider()`. It throws if Ember isn't loaded. Declare Ember as a [required dependency](/developers/quickstart#declare-ember-as-a-dependency) of your plugin so the lookup is always safe.
+
+## Example: log the running version
+
+```kotlin
+import sh.carr.ember.Ember
+import org.bukkit.plugin.java.JavaPlugin
+
+class MyPlugin : JavaPlugin() {
+    override fun onEnable() {
+        logger.info("Integrating with Ember ${Ember.instance.version}")
+    }
+}
+```

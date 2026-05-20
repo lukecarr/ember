@@ -1,0 +1,12 @@
+accessor
+APIs
+bukkit
+folia
+Javadocs
+lowercased
+minecraft
+repo
+subcommand
+subcommands
+walkthrough
+walkthroughs

@@ -1,0 +1,182 @@
+package sh.carr.ember.plugin.command
+
+import com.mojang.brigadier.Command
+import com.mojang.brigadier.CommandDispatcher
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import io.papermc.paper.command.brigadier.CommandSourceStack
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.HoverEvent
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+import org.bukkit.command.CommandSender
+import sh.carr.ember.flag.FlagManager
+import sh.carr.ember.plugin.flag.Flags
+
+private val plain = PlainTextComponentSerializer.plainText()
+
+/** Plain text of [c], plus the plain text of any hover-on-text contents found anywhere in the tree. */
+private fun visibleAndHover(c: Component): String {
+    val sb = StringBuilder()
+    sb.append(plain.serialize(c))
+
+    fun walk(component: Component) {
+        (component.style().hoverEvent())?.let { hover ->
+            if (hover.action() == HoverEvent.Action.SHOW_TEXT) {
+                val value = hover.value()
+                if (value is Component) {
+                    sb.append(" [hover: ")
+                    sb.append(plain.serialize(value))
+                    sb.append("]")
+                }
+            }
+        }
+        component.children().forEach { walk(it) }
+    }
+    walk(c)
+    return sb.toString()
+}
+
+private fun captureMessages(
+    source: CommandSourceStack,
+    sender: CommandSender,
+): MutableList<Component> {
+    val captured = mutableListOf<Component>()
+    every { source.sender } returns sender
+    every { sender.sendMessage(any<Component>()) } answers { captured.add(firstArg()) }
+    return captured
+}
+
+class FlagsCommandTest :
+    FunSpec({
+        context("node structure") {
+            test("literal is 'flags'") {
+                val mgr = mockk<FlagManager>()
+                FlagsCommand.node(mgr).build().literal shouldBe "flags"
+            }
+
+            test("registers 'list' and 'get' children") {
+                val mgr = mockk<FlagManager>()
+                val built = FlagsCommand.node(mgr).build()
+                built.getChild("list").shouldNotBeNull()
+                built.getChild("get").shouldNotBeNull()
+            }
+        }
+
+        context("requires predicate") {
+            test("list and get both gate on Permissions.FLAGS") {
+                val mgr = mockk<FlagManager>()
+                val source = mockk<CommandSourceStack>()
+                val sender = mockk<CommandSender>()
+                every { source.sender } returns sender
+                val grantedCalls = mutableListOf<String>()
+                every { sender.hasPermission(capture(grantedCalls)) } returns true
+
+                val built = FlagsCommand.node(mgr).build()
+                built.getChild("list").requirement.test(source) shouldBe true
+                built.getChild("get").requirement.test(source) shouldBe true
+
+                // Asserting the exact list catches a regression where `get`'s requirement stops
+                // calling hasPermission (a single-slot capture would silently retain `list`'s value).
+                grantedCalls shouldBe listOf(Permissions.FLAGS, Permissions.FLAGS)
+            }
+        }
+
+        context("list") {
+            test("emits a header plus one line per registered flag") {
+                val mgr = mockk<FlagManager>()
+                every { mgr.isEnabled(any()) } returns true
+
+                val source = mockk<CommandSourceStack>()
+                val sender = mockk<CommandSender>()
+                every { sender.hasPermission(Permissions.FLAGS) } returns true
+                val captured = captureMessages(source, sender)
+
+                val dispatcher = CommandDispatcher<CommandSourceStack>()
+                dispatcher.register(FlagsCommand.node(mgr))
+                dispatcher.execute("flags list", source) shouldBe Command.SINGLE_SUCCESS
+
+                captured shouldHaveSize (1 + Flags.entries.size)
+                plain.serialize(captured[0]) shouldBe "Flags:"
+                Flags.entries.forEachIndexed { i, flag ->
+                    val combined = visibleAndHover(captured[i + 1])
+                    combined.contains(flag.id) shouldBe true
+                    combined.contains("✔") shouldBe true
+                    combined.contains(flag.description) shouldBe true
+                }
+            }
+
+            test("renders disabled flags with the disabled badge") {
+                val mgr = mockk<FlagManager>()
+                every { mgr.isEnabled(any()) } returns false
+
+                val source = mockk<CommandSourceStack>()
+                val sender = mockk<CommandSender>()
+                every { sender.hasPermission(Permissions.FLAGS) } returns true
+                val captured = captureMessages(source, sender)
+
+                val dispatcher = CommandDispatcher<CommandSourceStack>()
+                dispatcher.register(FlagsCommand.node(mgr))
+                dispatcher.execute("flags list", source) shouldBe Command.SINGLE_SUCCESS
+
+                captured.drop(1).forEach { plain.serialize(it).contains("✘") shouldBe true }
+            }
+        }
+
+        context("get") {
+            test("default-on flag with isSet=false renders State: enabled and Operator: unset") {
+                val mgr = mockk<FlagManager>()
+                every { mgr.isSet(Flags.VersionCommand) } returns false
+                every { mgr.isEnabled(Flags.VersionCommand) } returns true
+
+                val source = mockk<CommandSourceStack>()
+                val sender = mockk<CommandSender>()
+                every { sender.hasPermission(Permissions.FLAGS) } returns true
+                val captured = captureMessages(source, sender)
+
+                val dispatcher = CommandDispatcher<CommandSourceStack>()
+                dispatcher.register(FlagsCommand.node(mgr))
+                dispatcher.execute("flags get command.version", source) shouldBe Command.SINGLE_SUCCESS
+
+                val joined = captured.joinToString("\n") { visibleAndHover(it) }
+                joined.contains("command.version") shouldBe true
+                joined.contains(Flags.VersionCommand.description) shouldBe true
+                joined.contains("Default: enabled") shouldBe true
+                joined.contains("Operator: unset") shouldBe true
+                joined.contains("State: enabled") shouldBe true
+            }
+
+            test("default-on flag with isSet=true renders State: disabled and Operator: set") {
+                val mgr = mockk<FlagManager>()
+                every { mgr.isSet(Flags.VersionCommand) } returns true
+                every { mgr.isEnabled(Flags.VersionCommand) } returns false
+
+                val source = mockk<CommandSourceStack>()
+                val sender = mockk<CommandSender>()
+                every { sender.hasPermission(Permissions.FLAGS) } returns true
+                val captured = captureMessages(source, sender)
+
+                val dispatcher = CommandDispatcher<CommandSourceStack>()
+                dispatcher.register(FlagsCommand.node(mgr))
+                dispatcher.execute("flags get command.version", source) shouldBe Command.SINGLE_SUCCESS
+
+                val joined = captured.joinToString("\n") { visibleAndHover(it) }
+                joined.contains("Default: enabled") shouldBe true
+                joined.contains("Operator: set") shouldBe true
+                joined.contains("State: disabled") shouldBe true
+            }
+        }
+
+        context("enabledLabel") {
+            test("returns 'enabled' when true") {
+                enabledLabel(true) shouldBe "enabled"
+            }
+
+            test("returns 'disabled' when false") {
+                enabledLabel(false) shouldBe "disabled"
+            }
+        }
+    })
