@@ -6,6 +6,16 @@ rss: true
 
 Ember follows [Semantic Versioning 2.0.0](https://semver.org/). Every release is published on [GitHub Releases](https://github.com/lukecarr/ember/releases) with the built jar and a SHA-256 checksum.
 
+<Update label="2026-05-22" description="This week in Ember">
+  **New features**
+
+  - **Feature flag system.** Toggle parts of Ember on or off at server startup by listing flags in `plugins/Ember/flags.txt`. Each flag has a built-in default, so you only need to list the ones you want to override. Lines starting with `#` are treated as comments. See [Feature flags](/server-owners/flags) for the full format and catalog ([#9](https://github.com/lukecarr/ember/pull/9)).
+  - **`/ember flags` command.** Inspect the active flag catalog in-game with `/ember flags list` and `/ember flags get <flag>`. Gated by the new `ember.flags` permission — see the [command reference](/commands/flags) and [permissions](/server-owners/permissions).
+  - **`command.version` flag.** The `/ember version` command is now gated by the `command.version` flag (enabled by default), so operators can hide it on locked-down servers.
+
+  Configuration links to the new flags page from [Configuration](/server-owners/configuration) and the [server owners overview](/server-owners).
+</Update>
+
 <Update label="2026-05-18" description="v0.1.0-alpha.1">
   The first published Ember build.
 
